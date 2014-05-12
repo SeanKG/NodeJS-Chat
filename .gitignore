@@ -17,3 +17,5 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+*.sublime-project
+*.sublime-workspace

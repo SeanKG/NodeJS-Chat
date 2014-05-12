@@ -36,13 +36,13 @@ function gracefulShutdown(kill){
 }
 
 app.post('/gitpull', function(req, res) {
-  var parsedUrl = url.parse(req.url, true);
-  if(parsedUrl.query['secret_key'] != config.secret_key) {
-      console.log("[warning] Unauthorized request " + req.url);
-      res.writeHead(401, "Not Authorized", {'Content-Type': 'text/html'});
-      res.end('401 - Not Authorized');
-      return;
-  }
+  // var parsedUrl = url.parse(req.url, true);
+  // if(parsedUrl.query['secret_key'] != config.secret_key) {
+  //     console.log("[warning] Unauthorized request " + req.url);
+  //     res.writeHead(401, "Not Authorized", {'Content-Type': 'text/html'});
+  //     res.end('401 - Not Authorized');
+  //     return;
+  // }
   res.end();
   io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE INITIATED...</span>'});
   function puts(error, stdout, stderr) {sys.puts(stdout)}
