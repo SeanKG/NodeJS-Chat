@@ -36,6 +36,28 @@ function gracefulShutdown(kill){
 }
 
 app.post('/gitpull', function(req, res) {
+  var parsedUrl = url.parse(req.url, true);
+  if(parsedUrl.query['secret_key'] != config.secret_key) {
+      console.log("[warning] Unauthorized request " + req.url);
+      res.writeHead(401, "Not Authorized", {'Content-Type': 'text/html'});
+      res.end('401 - Not Authorized');
+      return;
+  }
+  res.end();
+  io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE INITIATED...</span>'});
+  function puts(error, stdout, stderr) {sys.puts(stdout)}
+  exec("git reset --hard HEAD", puts);
+  exec("git pull", puts);
+
+  var arr = req.body.commits[0].modified;
+  if((arr.join(',').indexOf("app.min.js") > -1) || (arr.join(',').indexOf("app.min.css") > -1) || (arr.join(',').indexOf("index.ejs") > -1)){
+    io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NECCESARY.</span>'});
+  } else {
+    io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NOT NECCESARY.</span>'});
+  }
+});
+
+app.post('/gitcommit', function(req, res) {
   // var parsedUrl = url.parse(req.url, true);
   // if(parsedUrl.query['secret_key'] != config.secret_key) {
   //     console.log("[warning] Unauthorized request " + req.url);
@@ -48,12 +70,14 @@ app.post('/gitpull', function(req, res) {
   function puts(error, stdout, stderr) {sys.puts(stdout)}
   exec("git reset --hard HEAD", puts);
   exec("git pull", puts);
-  var arr = req.body.commits[0].modified;
-  if((arr.join(',').indexOf("app.min.js") > -1) || (arr.join(',').indexOf("app.min.css") > -1) || (arr.join(',').indexOf("index.ejs") > -1)){
-    io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NECCESARY.</span>'});
-  } else {
-    io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NOT NECCESARY.</span>'});
-  }
+
+  io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD MAY BE NECCESARY.</span>'});
+  // var arr = req.body.commits[0].modified;
+  // if((arr.join(',').indexOf("app.min.js") > -1) || (arr.join(',').indexOf("app.min.css") > -1) || (arr.join(',').indexOf("index.ejs") > -1)){
+  //   io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NECCESARY.</span>'});
+  // } else {
+  //   io.sockets.emit('annouce', {message : '<span class="adminMessage">SYSTEM UPDATE COMPLETE, BROWSER RELOAD IS NOT NECCESARY.</span>'});
+  // }
 });
 
 app.get('*', function(req, res) {
