@@ -75,6 +75,17 @@ function makeFancy(str){
             tempStr = tempStr.replace('*','');
         }
     }
+    while(tempStr.indexOf("$") !== -1) {
+        var firstPos = tempStr.indexOf("$");
+        var nextPos = tempStr.indexOf("$",firstPos + 1);
+        if(nextPos !== -1) {
+            var innerTxt = tempStr.substring(firstPos + 1,nextPos);
+            var strongified = '<span class="adminMessage">' + innerTxt + '</span>';
+            tempStr = tempStr.substring(0,firstPos) + strongified + tempStr.substring(nextPos + 1,tempStr.length);
+        } else {
+            tempStr = tempStr.replace('$','');
+        }
+    }
     return tempStr;
 }
 
